@@ -1,0 +1,20 @@
+meta {
+  name: delete permission
+  type: http
+  seq: 13
+}
+
+delete {
+  url: {{auth-service}}/permissions/APPROVE_DATA
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJxbml0MTguY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3Njc1MDA0NDksImlhdCI6MTc2NzQ5Njg0OSwic2NvcGUiOiJST0xFX1JvbGUobmFtZT1BRE1JTiwgZGVzY3JpcHRpb249QWRtaW4gcm9sZSwgcGVybWlzc2lvbnM9W10pIn0.v8d_KvKfdLlipPcWhiq7sDTkinRyTBx2GgJiYLfdp_VXVkK39g9URdwixqDdISe1S9ZUWABYAmL5hE2DoYtluw
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,21 @@
+{
+  "short_name": "GenZF",
+  "name": "GenZF Finance & Portfolio",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2527/2527962.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2527/2527962.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0ea5e9",
+  "background_color": "#0f172a",
+  "orientation": "portrait"
+}

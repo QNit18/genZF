@@ -1,0 +1,21 @@
+meta {
+  name: refresh Token
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:8080/identity/auth/refresh
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "token": "eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkZXZ0ZXJpYS5jb20iLCJzdWIiOiJhZG1pbiIsImV4cCI6MTcxNDg3MDEwNCwiaWF0IjoxNzE0ODcwMDg0LCJqdGkiOiIxY2YzMzM3MS1lYWNiLTRkMzEtOTA5Zi0wYjY1ZGZlNzQyMGEiLCJzY29wZSI6IlJPTEVfQURNSU4ifQ.u07w93qbf8t47ljQzFNqfDTUdaHggK6bRAA4cutnDuQ548B38gD_PXKuHCGigzVjhJWz0W2ImWYZmhx9tJ-G4w"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

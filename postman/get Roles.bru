@@ -1,0 +1,19 @@
+meta {
+  name: get Roles
+  type: http
+  seq: 15
+}
+
+get {
+  url: http://localhost:8080/identity/roles
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkZXZ0ZXJpYS5jb20iLCJzdWIiOiJhZG1pbiIsImV4cCI6MTcxMTg4NjY2NCwiaWF0IjoxNzExODgzMDY0LCJzY29wZSI6IiJ9.8Pfh79dv-QZqlE9pLKIucRF-4fGqDba0S28ZRvtHN8R98vKoCHY89ZRcmhjl-nEA02dbCV59a3IhEIk0QOcWLQ
+}
+
+settings {
+  encodeUrl: true
+}

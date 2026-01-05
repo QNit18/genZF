@@ -1,0 +1,21 @@
+meta {
+  name: logout
+  type: http
+  seq: 10
+}
+
+post {
+  url: http://localhost:8080/identity/auth/logout
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "token": "eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkZXZ0ZXJpYS5jb20iLCJzdWIiOiJhZG1pbiIsImV4cCI6MTcxNTI2NjAzNSwiaWF0IjoxNzE1MjYyNDM1LCJqdGkiOiJhNDg2YzI5OC1mYzU1LTQ1MmEtOTI3MS0xMzRlMzA2ZjI0Y2IiLCJzY29wZSI6IlJPTEVfQURNSU4ifQ.00d2mLpFTnZICKqlVYiRJBP0zOdzRk6XJRVb_RWgQtaf6_bmj43zGWKMEzpz2ZzkwBMRz4hTLLFCdh4uBMzNXw"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

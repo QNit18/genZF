@@ -1,0 +1,32 @@
+meta {
+  name: update User
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{auth-service}}/users/f60c94bf-2caa-4cf0-92d6-fd1cf0e8940e
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkZXZ0ZXJpYS5jb20iLCJzdWIiOiJhZG1pbiIsImV4cCI6MTcxMTg4MzcxMSwiaWF0IjoxNzExODgwMTExLCJzY29wZSI6IiJ9.bQ72do9GpuV_5NmW7CJoIisx53cM3mMeu2mov5Kn5flsW8GT5UhYJV_eNz3uq7kxjojM6e9osn8uzYMz8ugjYQ
+}
+
+body:json {
+  {
+      "password": "admin",
+      "firstName": "Admin",
+      "lastName": "Admin",
+      "dob": "1990-09-02",
+      "roles": [
+          "ADMIN"
+      ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

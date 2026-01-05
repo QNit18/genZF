@@ -1,0 +1,28 @@
+meta {
+  name: create Role
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{auth-service}}/roles
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJxbml0MTguY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3Njc1MDE1MzksImlhdCI6MTc2NzQ5NzkzOSwic2NvcGUiOiJST0xFX1JvbGUobmFtZT1BRE1JTiwgZGVzY3JpcHRpb249QWRtaW4gcm9sZSwgcGVybWlzc2lvbnM9W10pIn0.WewDkOov4jiHRMl0IG42QetZRT4-hgJ9wz7TGZtFLvksSrNPjIOx63d3A9FtUH6I5PaWgFqbmjRmxex1K1Pa6g
+}
+
+body:json {
+  {
+      "name":"USER",
+      "description": "User role",
+      "permissions" : ["CREATE_DATA", "UPDATE_DATA"]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
