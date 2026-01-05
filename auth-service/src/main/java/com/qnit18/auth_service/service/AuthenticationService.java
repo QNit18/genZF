@@ -98,13 +98,13 @@ public class AuthenticationService {
             SignedJWT signedJWT = SignedJWT.parse(token);
             JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
 
-            // Check if token has been invalidated (logged out)
-            if (valideTokenRepository.existsById(claims.getJWTID())) {
+            // Verify signature and expiration
+            if (!(signedJWT.verify(verifier) && claims.getExpirationTime().after(new Date()))) {
                 throw new AppException(ErrorCode.UNAUTHENTICATED);
             }
 
-            // Verify signature and expiration
-            if (!(signedJWT.verify(verifier) && claims.getExpirationTime().after(new Date()))) {
+            // Check if token has been invalidated (logged out)
+            if (valideTokenRepository.existsById(claims.getJWTID())) {
                 throw new AppException(ErrorCode.UNAUTHENTICATED);
             }
 
@@ -141,7 +141,7 @@ public class AuthenticationService {
         return jwsObject.serialize();
     }
 
-    public String buildScope(User user) {
+    String buildScope(User user) {
         StringJoiner scopeJoiner = new StringJoiner(" ");
         if (!CollectionUtils.isEmpty(user.getRoles())) {
             user.getRoles().forEach(role -> {

@@ -41,8 +41,8 @@ public class SecurityConfig {
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(customJwtDecoder)
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())) // When decoding the JWT, convert to Auth object
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()) // When authentication fails
         );
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
