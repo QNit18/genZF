@@ -6,6 +6,8 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
+import com.qnit18.auth_service.validator.DobConstraint;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,5 +21,7 @@ public class UserCreationRequest {
     String password;
     String firstName;
     String lastName;
+
+    @DobConstraint(min = 18, message = "INVALID_DOB")
     LocalDate dob;
 }

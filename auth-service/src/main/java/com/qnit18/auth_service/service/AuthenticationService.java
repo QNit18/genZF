@@ -106,7 +106,10 @@ public class AuthenticationService {
         StringJoiner scopeJoiner = new StringJoiner(" ");
         if (!CollectionUtils.isEmpty(user.getRoles())) {
             user.getRoles().forEach(role -> {
-                scopeJoiner.add("ROLE_" + role);
+                scopeJoiner.add("ROLE_" + role.getName());
+                if (!CollectionUtils.isEmpty(role.getPermissions())) {
+                    role.getPermissions().forEach(permission -> scopeJoiner.add(permission.getName()));
+                }
             });
             return scopeJoiner.toString();
         } else {

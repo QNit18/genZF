@@ -54,7 +54,7 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('APPROVE_DATA')")
     public List<UserResponse> getUsers(){
         return userRepository.findAll().stream()
                 .map(userMapper::toUserResponse).toList();
