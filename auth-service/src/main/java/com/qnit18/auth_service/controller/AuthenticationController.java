@@ -2,6 +2,7 @@ package com.qnit18.auth_service.controller;
 
 import com.qnit18.auth_service.dto.request.AuthenticationRequest;
 import com.qnit18.auth_service.dto.request.IntrospectRequest;
+import com.qnit18.auth_service.dto.request.LogoutRequest;
 import com.qnit18.auth_service.dto.response.ApiBaseResponse;
 import com.qnit18.auth_service.dto.response.AuthenticationResponse;
 import com.qnit18.auth_service.dto.response.IntrospectResponse;
@@ -38,5 +39,11 @@ public class AuthenticationController {
         return ApiBaseResponse.<IntrospectResponse>builder()
                 .result(result)
                 .build();
+    }
+
+    @PostMapping("/logout")
+    ApiBaseResponse<Void> logout(@RequestBody LogoutRequest logoutRequest) throws Exception {
+        authenticationService.logout(logoutRequest.getToken());
+        return ApiBaseResponse.<Void>builder().build();
     }
 }

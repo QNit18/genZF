@@ -9,16 +9,19 @@ import com.qnit18.auth_service.dto.request.AuthenticationRequest;
 import com.qnit18.auth_service.dto.request.IntrospectRequest;
 import com.qnit18.auth_service.dto.response.AuthenticationResponse;
 import com.qnit18.auth_service.dto.response.IntrospectResponse;
+import com.qnit18.auth_service.entity.InvalidedToken;
 import com.qnit18.auth_service.entity.User;
 import com.qnit18.auth_service.exception.AppException;
 import com.qnit18.auth_service.exception.ErrorCode;
 import com.qnit18.auth_service.repository.UserRepository;
+import com.qnit18.auth_service.repository.ValideTokenRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -27,6 +30,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -38,14 +42,16 @@ public class AuthenticationService {
     String SIGNING_KEY;
 
     UserRepository userRepository;
-    PasswordEncoder passwordEncoder;
+    ValideTokenRepository valideTokenRepository;
 
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         var userOptional = userRepository.findByUsername(authenticationRequest.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        boolean authenticated = passwordEncoder.matches(authenticationRequest.getPassword(), userOptional.getPassword());
+        boolean authenticated = passwordEncoder.matches(authenticationRequest.getPassword(),
+                userOptional.getPassword());
 
-        if (!authenticated){
+        if (!authenticated) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
@@ -57,27 +63,59 @@ public class AuthenticationService {
                 .build();
     }
 
-    public IntrospectResponse introspect(IntrospectRequest request) {
-        var token = request.getToken();
-
+    public void logout(String token) throws Exception {
         try {
-            JWSVerifier verifier = new MACVerifier(SIGNING_KEY);
-            SignedJWT signedJWT = SignedJWT.parse(token);
-
-            Date expiration = signedJWT.getJWTClaimsSet().getExpirationTime();
-
-            boolean verified = signedJWT.verify(verifier) && expiration.after(new Date());
-
-            return IntrospectResponse.builder()
-                    .valid(verified)
-                    .build();
+            var signToken = verifyToken(token);
+            String jit = signToken.getJWTClaimsSet().getJWTID();
+            Date expiredTime = signToken.getJWTClaimsSet().getExpirationTime();
+            valideTokenRepository.save(InvalidedToken.builder()
+                    .id(jit)
+                    .expiredTime(expiredTime)
+                    .build());
         } catch (Exception e) {
-            log.error("Cannot introspect token : {}", e.getMessage());
+            log.error("Cannot logout token : {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
-    String generateToken(User user){
+    public IntrospectResponse introspect(IntrospectRequest request) {
+        try {
+            verifyToken(request.getToken());
+            return IntrospectResponse.builder()
+                    .valid(true)
+                    .build();
+        } catch (Exception e) {
+            log.info("Token introspection failed: {}", e.getMessage());
+            return IntrospectResponse.builder()
+                    .valid(false)
+                    .build();
+        }
+    }
+
+    SignedJWT verifyToken(String token) throws Exception {
+        try {
+            JWSVerifier verifier = new MACVerifier(SIGNING_KEY);
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+
+            // Check if token has been invalidated (logged out)
+            if (valideTokenRepository.existsById(claims.getJWTID())) {
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
+            }
+
+            // Verify signature and expiration
+            if (!(signedJWT.verify(verifier) && claims.getExpirationTime().after(new Date()))) {
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
+            }
+
+            return signedJWT;
+        } catch (Exception e) {
+            log.error("Token verification failed: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         // Token generation logic to be implemented
@@ -86,6 +124,7 @@ public class AuthenticationService {
                 .issuer("qnit18.com")
                 .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                 .issueTime(new Date())
+                .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .build();
 
@@ -102,7 +141,7 @@ public class AuthenticationService {
         return jwsObject.serialize();
     }
 
-    public String buildScope(User user){
+    public String buildScope(User user) {
         StringJoiner scopeJoiner = new StringJoiner(" ");
         if (!CollectionUtils.isEmpty(user.getRoles())) {
             user.getRoles().forEach(role -> {

@@ -1,5 +1,6 @@
 package com.qnit18.auth_service.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,33 +25,28 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableMethodSecurity   
 public class SecurityConfig {
 
-    @Value("${security.signing-key}")
-    private String SIGNING_KEY;
-
-    private final String[] PUBLIC_POST_ENDPOINTS = {
-            "/users",
-            "/auth/token",
-            "/auth/introspect"
+     private final String[] PUBLIC_ENDPOINTS = {"/users",
+            "/auth/token", "/auth/introspect", "/auth/logout"
     };
-    
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(
-                authorizeRequests ->
-                        authorizeRequests
-                                .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
-                                .anyRequest().authenticated());
 
-        http.oauth2ResourceServer(oauth2 ->
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.authorizeHttpRequests(request ->
+                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated());
+
+        httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
-                        jwtConfigurer
-                                .decoder(jwtDecoder())
+                        jwtConfigurer.decoder(customJwtDecoder)
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
         );
+        httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
-        http.csrf(AbstractHttpConfigurer::disable);
-        return http.build();
+        return httpSecurity.build();
     }
 
     @Bean
@@ -60,20 +56,12 @@ public class SecurityConfig {
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+
         return jwtAuthenticationConverter;
     }
 
     @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKey = new SecretKeySpec(SIGNING_KEY.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKey)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder(10);
     }
 }
