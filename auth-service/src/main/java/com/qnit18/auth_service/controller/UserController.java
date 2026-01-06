@@ -43,6 +43,13 @@ public class UserController {
         return userService.getUser(userId);
     }
 
+    @GetMapping("/my-info")
+    ApiBaseResponse<UserResponse> getMyInfo() {
+        return ApiBaseResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
+    }
+
     @GetMapping
     List<UserResponse> getUsers(){
         return userService.getUsers();

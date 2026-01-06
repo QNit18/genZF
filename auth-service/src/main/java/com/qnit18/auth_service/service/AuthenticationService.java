@@ -7,6 +7,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.qnit18.auth_service.dto.request.AuthenticationRequest;
 import com.qnit18.auth_service.dto.request.IntrospectRequest;
+import com.qnit18.auth_service.dto.request.RefreshTokenRequest;
 import com.qnit18.auth_service.dto.response.AuthenticationResponse;
 import com.qnit18.auth_service.dto.response.IntrospectResponse;
 import com.qnit18.auth_service.entity.InvalidedToken;
@@ -90,6 +91,27 @@ public class AuthenticationService {
                     .valid(false)
                     .build();
         }
+    }
+
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) throws Exception{
+        var signnedJWT = verifyToken(request.getToken());
+        
+        String jit = signnedJWT.getJWTClaimsSet().getJWTID();
+        Date expiredTime = signnedJWT.getJWTClaimsSet().getExpirationTime();
+        valideTokenRepository.save(InvalidedToken.builder()
+                    .id(jit)
+                    .expiredTime(expiredTime)
+                    .build());
+
+        var userName = signnedJWT.getJWTClaimsSet().getSubject();
+        User user = userRepository.findByUsername(userName)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        String token = generateToken(user);    // new token
+
+        return AuthenticationResponse.builder()
+                .authenticated(true)
+                .token(token)
+                .build();
     }
 
     SignedJWT verifyToken(String token) throws Exception {

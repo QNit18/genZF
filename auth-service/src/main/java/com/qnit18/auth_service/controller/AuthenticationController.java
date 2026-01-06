@@ -3,6 +3,7 @@ package com.qnit18.auth_service.controller;
 import com.qnit18.auth_service.dto.request.AuthenticationRequest;
 import com.qnit18.auth_service.dto.request.IntrospectRequest;
 import com.qnit18.auth_service.dto.request.LogoutRequest;
+import com.qnit18.auth_service.dto.request.RefreshTokenRequest;
 import com.qnit18.auth_service.dto.response.ApiBaseResponse;
 import com.qnit18.auth_service.dto.response.AuthenticationResponse;
 import com.qnit18.auth_service.dto.response.IntrospectResponse;
@@ -45,5 +46,14 @@ public class AuthenticationController {
     ApiBaseResponse<Void> logout(@RequestBody LogoutRequest logoutRequest) throws Exception {
         authenticationService.logout(logoutRequest.getToken());
         return ApiBaseResponse.<Void>builder().build();
+    }
+
+    @PostMapping("/refresh-token")
+    public ApiBaseResponse<AuthenticationResponse> refreshToken
+            (@RequestBody RefreshTokenRequest request) throws Exception {
+        var result = authenticationService.refreshToken(request); 
+        return ApiBaseResponse.<AuthenticationResponse>builder()
+                .result(result)
+                .build();
     }
 }
