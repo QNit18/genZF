@@ -39,8 +39,16 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
     @NonFinal
-    @Value("${security.signing-key}")
+    @Value("${jwt.signing-key}")
     String SIGNING_KEY;
+
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    long VALID_DURATION;
+
+    @NonFinal
+    @Value("${jwt.refreshable-duration}")
+    long REFRESHABLE_DURATION;
 
     UserRepository userRepository;
     ValideTokenRepository valideTokenRepository;
@@ -66,7 +74,7 @@ public class AuthenticationService {
 
     public void logout(String token) throws Exception {
         try {
-            var signToken = verifyToken(token);
+            var signToken = verifyToken(token, true);
             String jit = signToken.getJWTClaimsSet().getJWTID();
             Date expiredTime = signToken.getJWTClaimsSet().getExpirationTime();
             valideTokenRepository.save(InvalidedToken.builder()
@@ -74,14 +82,14 @@ public class AuthenticationService {
                     .expiredTime(expiredTime)
                     .build());
         } catch (Exception e) {
-            log.error("Cannot logout token : {}", e.getMessage());
+            log.error("Token ready expired : {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     public IntrospectResponse introspect(IntrospectRequest request) {
         try {
-            verifyToken(request.getToken());
+            verifyToken(request.getToken(), false);
             return IntrospectResponse.builder()
                     .valid(true)
                     .build();
@@ -94,7 +102,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse refreshToken(RefreshTokenRequest request) throws Exception{
-        var signnedJWT = verifyToken(request.getToken());
+        var signnedJWT = verifyToken(request.getToken(), true);
         
         String jit = signnedJWT.getJWTClaimsSet().getJWTID();
         Date expiredTime = signnedJWT.getJWTClaimsSet().getExpirationTime();
@@ -114,15 +122,33 @@ public class AuthenticationService {
                 .build();
     }
 
-    SignedJWT verifyToken(String token) throws Exception {
+    SignedJWT verifyToken(String token, boolean isRefresh) throws Exception {
         try {
             JWSVerifier verifier = new MACVerifier(SIGNING_KEY);
             SignedJWT signedJWT = SignedJWT.parse(token);
-            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
-
-            // Verify signature and expiration
-            if (!(signedJWT.verify(verifier) && claims.getExpirationTime().after(new Date()))) {
+            
+            // Verify signature first
+            if (!signedJWT.verify(verifier)) {
                 throw new AppException(ErrorCode.UNAUTHENTICATED);
+            }
+            
+            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+            Date now = new Date();
+            
+            // Verify expiration based on token type
+            Date expirationTime = claims.getExpirationTime();
+            if (isRefresh) {
+                // For refresh tokens, check if token is within refreshable duration from issue time
+                Instant issueTime = claims.getIssueTime().toInstant();
+                Instant refreshableUntil = issueTime.plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS);
+                if (refreshableUntil.isBefore(now.toInstant())) {
+                    throw new AppException(ErrorCode.UNAUTHENTICATED);
+                }
+            } else {
+                // For access tokens, check standard expiration
+                if (expirationTime == null || expirationTime.before(now)) {
+                    throw new AppException(ErrorCode.UNAUTHENTICATED);
+                }
             }
 
             // Check if token has been invalidated (logged out)
@@ -131,9 +157,11 @@ public class AuthenticationService {
             }
 
             return signedJWT;
+        } catch (AppException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Token verification failed: {}", e.getMessage());
-            throw e;
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
     }
 
@@ -144,7 +172,7 @@ public class AuthenticationService {
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
                 .issuer("qnit18.com")
-                .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                .expirationTime(Date.from(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS)))
                 .issueTime(new Date())
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
