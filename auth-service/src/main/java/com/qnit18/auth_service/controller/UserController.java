@@ -9,10 +9,13 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class UserController {
 
     @PostMapping
     ApiBaseResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
+        log.info("Creating user: {}", request);
         ApiBaseResponse<UserResponse> response = new ApiBaseResponse<>();
         response.setResult(userService.createUser(request));
         return response;
