@@ -4,7 +4,6 @@ import com.qnit18.main_service.dto.request.PortfolioCreationRequest;
 import com.qnit18.main_service.dto.response.ApiBaseResponse;
 import com.qnit18.main_service.dto.response.PortfolioResponse;
 import com.qnit18.main_service.service.PortfolioService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;

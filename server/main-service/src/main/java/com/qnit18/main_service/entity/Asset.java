@@ -9,7 +9,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -68,8 +67,4 @@ public class Asset {
     @Column(nullable = false)
     @Builder.Default
     Boolean assetHome = false;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ChartData> chartDataList;
 }

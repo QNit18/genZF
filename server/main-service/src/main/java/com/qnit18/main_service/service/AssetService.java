@@ -71,13 +71,6 @@ public class AssetService {
         return assetMapper.toAssetResponse(asset);
     }
 
-    @Transactional(readOnly = true)
-    public List<AssetResponse> getAllAssets() {
-        return assetRepository.findAll().stream()
-                .map(assetMapper::toAssetResponse)
-                .toList();
-    }
-
     @Transactional
     public void deleteAsset(UUID id) {
         if (!assetRepository.existsById(id)) {
@@ -92,7 +85,6 @@ public class AssetService {
                 .orElseThrow(() -> new AppException(ErrorCode.ASSET_NOT_FOUND));
 
         if (request.getCurrentPrice() != null) {
-            BigDecimal oldPrice = asset.getCurrentPrice();
             asset.setCurrentPrice(request.getCurrentPrice());
             
             if (asset.getOpen() != null) {

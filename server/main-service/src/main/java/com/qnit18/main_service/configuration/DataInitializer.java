@@ -2,9 +2,12 @@ package com.qnit18.main_service.configuration;
 
 import com.qnit18.main_service.constant.AssetCategory;
 import com.qnit18.main_service.constant.MarketStatus;
-import com.qnit18.main_service.constant.Timeframe;
-import com.qnit18.main_service.entity.*;
-import com.qnit18.main_service.repository.*;
+import com.qnit18.main_service.entity.Asset;
+import com.qnit18.main_service.entity.AssetUser;
+import com.qnit18.main_service.entity.Portfolio;
+import com.qnit18.main_service.repository.AssetRepository;
+import com.qnit18.main_service.repository.AssetUserRepository;
+import com.qnit18.main_service.repository.PortfolioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -13,9 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -24,11 +24,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private final AssetRepository assetRepository;
     private final PortfolioRepository portfolioRepository;
-    private final BudgetRuleRepository budgetRuleRepository;
-    private final BudgetEntryRepository budgetEntryRepository;
     private final AssetUserRepository assetUserRepository;
-    private final ChartDataRepository chartDataRepository;
-    private final SeriesItemRepository seriesItemRepository;
 
     // Example user IDs - these should exist in auth-service
     private static final String USER_ID_1 = "550e8400-e29b-41d4-a716-446655440000";
@@ -70,18 +66,6 @@ public class DataInitializer implements CommandLineRunner {
                 new BigDecimal("3450.00"), new BigDecimal("3480.00"), new BigDecimal("3420.00"),
                 new BigDecimal("3455.00"), 0.14f, new BigDecimal("5.00"), 1800000L, MarketStatus.OPEN);
 
-        // Create Chart Data for Gold
-        ChartData goldChart1D = createChartData(gold, Timeframe.ONE_DAY);
-        ChartData goldChart1W = createChartData(gold, Timeframe.ONE_WEEK);
-        createSeriesItems(goldChart1D, new BigDecimal("2650.00"), 10);
-        createSeriesItems(goldChart1W, new BigDecimal("2640.00"), 7);
-
-        // Create Chart Data for Bitcoin
-        ChartData btcChart1D = createChartData(bitcoin, Timeframe.ONE_DAY);
-        ChartData btcChart1M = createChartData(bitcoin, Timeframe.ONE_MONTH);
-        createSeriesItems(btcChart1D, new BigDecimal("67500.00"), 10);
-        createSeriesItems(btcChart1M, new BigDecimal("67000.00"), 30);
-
         // Create Portfolios (using userId strings)
         Portfolio portfolio1 = createPortfolio(USER_ID_1);
         Portfolio portfolio2 = createPortfolio(USER_ID_2);
@@ -105,24 +89,8 @@ public class DataInitializer implements CommandLineRunner {
         createAssetUser(portfolio3, "Bitcoin", new BigDecimal("1.0"), new BigDecimal("70000.00"),
                 null, new BigDecimal("4.0"), true); // Deleted holding
 
-        // Create Budget Rules (using userId strings)
-        BudgetRule budgetRule1 = createBudgetRule(USER_ID_1, new BigDecimal("5000.00"));
-        createBudgetEntry(budgetRule1, "Needs", 50);
-        createBudgetEntry(budgetRule1, "Wants", 30);
-        createBudgetEntry(budgetRule1, "Savings", 20);
-
-        BudgetRule budgetRule2 = createBudgetRule(USER_ID_2, new BigDecimal("7500.00"));
-        createBudgetEntry(budgetRule2, "Needs", 40);
-        createBudgetEntry(budgetRule2, "Wants", 30);
-        createBudgetEntry(budgetRule2, "Savings", 30);
-
-        BudgetRule budgetRule3 = createBudgetRule(USER_ID_3, new BigDecimal("10000.00"));
-        createBudgetEntry(budgetRule3, "Needs", 50);
-        createBudgetEntry(budgetRule3, "Wants", 25);
-        createBudgetEntry(budgetRule3, "Savings", 25);
-
         log.info("Example data initialization completed successfully!");
-        log.info("Created: 5 assets, 4 chart data entries, 3 portfolios, 7 asset holdings, 3 budget rules");
+        log.info("Created: 5 assets, 3 portfolios, 7 asset holdings");
     }
 
     private Asset createAsset(String symbol, String assetName, AssetCategory category,
@@ -147,30 +115,6 @@ public class DataInitializer implements CommandLineRunner {
         return assetRepository.save(asset);
     }
 
-    private ChartData createChartData(Asset asset, Timeframe timeframe) {
-        ChartData chartData = ChartData.builder()
-                .asset(asset)
-                .timeframe(timeframe)
-                .build();
-        return chartDataRepository.save(chartData);
-    }
-
-    private void createSeriesItems(ChartData chartData, BigDecimal basePrice, int count) {
-        List<SeriesItem> items = new ArrayList<>();
-        long baseTimestamp = System.currentTimeMillis() / 1000 - (count * 3600); // Start from count hours ago
-        
-        for (int i = 0; i < count; i++) {
-            BigDecimal price = basePrice.add(new BigDecimal(Math.random() * 20 - 10)); // Random variation
-            SeriesItem item = SeriesItem.builder()
-                    .chartData(chartData)
-                    .timestamp(baseTimestamp + (i * 3600))
-                    .price(price)
-                    .build();
-            items.add(item);
-        }
-        seriesItemRepository.saveAll(items);
-    }
-
     private Portfolio createPortfolio(String userId) {
         Portfolio portfolio = Portfolio.builder()
                 .userId(userId)
@@ -191,23 +135,6 @@ public class DataInitializer implements CommandLineRunner {
                 .deleted(deleted != null ? deleted : false)
                 .build();
         return assetUserRepository.save(assetUser);
-    }
-
-    private BudgetRule createBudgetRule(String userId, BigDecimal monthlyIncome) {
-        BudgetRule budgetRule = BudgetRule.builder()
-                .userId(userId)
-                .monthlyIncome(monthlyIncome)
-                .build();
-        return budgetRuleRepository.save(budgetRule);
-    }
-
-    private BudgetEntry createBudgetEntry(BudgetRule budgetRule, String name, Integer percent) {
-        BudgetEntry entry = BudgetEntry.builder()
-                .budgetRule(budgetRule)
-                .name(name)
-                .percent(percent)
-                .build();
-        return budgetEntryRepository.save(entry);
     }
 }
 
