@@ -40,7 +40,7 @@ public class PortfolioController {
     }
 
     @GetMapping("/user/{userId}")
-    ApiBaseResponse<PortfolioResponse> getPortfolioByUserId(@PathVariable UUID userId) {
+    ApiBaseResponse<PortfolioResponse> getPortfolioByUserId(@PathVariable String userId) {
         ApiBaseResponse<PortfolioResponse> response = new ApiBaseResponse<>();
         response.setResult(portfolioService.getPortfolioByUserId(userId));
         return response;

@@ -23,6 +23,9 @@ jwt:
   valid-duration: 3600 # in second
   refreshable-duration: 36000 # insecond
 
+auth-service:
+  url: http://localhost:8080
+
 springdoc:
   api-docs:
     path: /api-docs

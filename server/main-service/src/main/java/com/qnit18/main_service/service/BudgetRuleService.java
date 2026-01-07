@@ -1,19 +1,18 @@
 package com.qnit18.main_service.service;
 
+import com.qnit18.main_service.client.AuthServiceClient;
 import com.qnit18.main_service.dto.request.BudgetEntryCreationRequest;
 import com.qnit18.main_service.dto.request.BudgetRuleCreationRequest;
 import com.qnit18.main_service.dto.request.BudgetRuleUpdateRequest;
 import com.qnit18.main_service.dto.response.BudgetRuleResponse;
 import com.qnit18.main_service.entity.BudgetEntry;
 import com.qnit18.main_service.entity.BudgetRule;
-import com.qnit18.main_service.entity.User;
 import com.qnit18.main_service.exception.AppException;
 import com.qnit18.main_service.exception.ErrorCode;
 import com.qnit18.main_service.mapper.BudgetEntryMapper;
 import com.qnit18.main_service.mapper.BudgetRuleMapper;
 import com.qnit18.main_service.repository.BudgetEntryRepository;
 import com.qnit18.main_service.repository.BudgetRuleRepository;
-import com.qnit18.main_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,14 +28,16 @@ import java.util.UUID;
 public class BudgetRuleService {
     BudgetRuleRepository budgetRuleRepository;
     BudgetEntryRepository budgetEntryRepository;
-    UserRepository userRepository;
+    AuthServiceClient authServiceClient;
     BudgetRuleMapper budgetRuleMapper;
     BudgetEntryMapper budgetEntryMapper;
 
     @Transactional
     public BudgetRuleResponse createBudgetRule(BudgetRuleCreationRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        // Validate user exists in auth-service
+        if (!authServiceClient.validateUser(request.getUserId())) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
 
         if (budgetRuleRepository.findByUserId(request.getUserId()).isPresent()) {
             throw new AppException(ErrorCode.INVALID_KEY);
@@ -45,7 +46,6 @@ public class BudgetRuleService {
         validateBudgetPercentages(request.getBudgets());
 
         BudgetRule budgetRule = budgetRuleMapper.toBudgetRule(request);
-        budgetRule.setUser(user);
 
         BudgetRule savedBudgetRule = budgetRuleRepository.save(budgetRule);
 
@@ -90,7 +90,7 @@ public class BudgetRuleService {
     }
 
     @Transactional(readOnly = true)
-    public BudgetRuleResponse getBudgetRuleByUserId(UUID userId) {
+    public BudgetRuleResponse getBudgetRuleByUserId(String userId) {
         BudgetRule budgetRule = budgetRuleRepository.findByUserId(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.BUDGET_RULE_NOT_FOUND));
         return budgetRuleMapper.toBudgetRuleResponse(budgetRule);

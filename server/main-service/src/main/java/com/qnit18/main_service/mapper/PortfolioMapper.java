@@ -9,13 +9,13 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring", uses = {AssetUserMapper.class})
 public interface PortfolioMapper {
-    @Mapping(target = "user", ignore = true)
     @Mapping(target = "assetUsers", ignore = true)
     @Mapping(target = "totalNetWorth", ignore = true)
     @Mapping(target = "profit", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Portfolio toPortfolio(PortfolioCreationRequest request);
     
-    @Mapping(target = "userId", source = "user.id")
     PortfolioResponse toPortfolioResponse(Portfolio portfolio);
     
     void updatePortfolio(@MappingTarget Portfolio portfolio, PortfolioCreationRequest request);

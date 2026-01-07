@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.UUID;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +11,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PortfolioCreationRequest {
     @NotNull(message = "User ID is required")
-    UUID userId;
+    String userId;
 }
 

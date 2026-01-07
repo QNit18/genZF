@@ -7,7 +7,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +15,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BudgetRuleCreationRequest {
     @NotNull(message = "User ID is required")
-    UUID userId;
+    String userId;
 
     @NotNull(message = "Monthly income is required")
     BigDecimal monthlyIncome;

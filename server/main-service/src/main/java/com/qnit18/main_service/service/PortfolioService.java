@@ -1,15 +1,14 @@
 package com.qnit18.main_service.service;
 
+import com.qnit18.main_service.client.AuthServiceClient;
 import com.qnit18.main_service.dto.request.PortfolioCreationRequest;
 import com.qnit18.main_service.dto.response.PortfolioResponse;
 import com.qnit18.main_service.entity.AssetUser;
 import com.qnit18.main_service.entity.Portfolio;
-import com.qnit18.main_service.entity.User;
 import com.qnit18.main_service.exception.AppException;
 import com.qnit18.main_service.exception.ErrorCode;
 import com.qnit18.main_service.mapper.PortfolioMapper;
 import com.qnit18.main_service.repository.PortfolioRepository;
-import com.qnit18.main_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,20 +23,21 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PortfolioService {
     PortfolioRepository portfolioRepository;
-    UserRepository userRepository;
+    AuthServiceClient authServiceClient;
     PortfolioMapper portfolioMapper;
 
     @Transactional
     public PortfolioResponse createPortfolio(PortfolioCreationRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        // Validate user exists in auth-service
+        if (!authServiceClient.validateUser(request.getUserId())) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
 
         if (portfolioRepository.findByUserId(request.getUserId()).isPresent()) {
             throw new AppException(ErrorCode.INVALID_KEY);
         }
 
         Portfolio portfolio = portfolioMapper.toPortfolio(request);
-        portfolio.setUser(user);
         Portfolio savedPortfolio = portfolioRepository.save(portfolio);
         
         PortfolioResponse response = portfolioMapper.toPortfolioResponse(savedPortfolio);
@@ -57,7 +56,7 @@ public class PortfolioService {
     }
 
     @Transactional(readOnly = true)
-    public PortfolioResponse getPortfolioByUserId(UUID userId) {
+    public PortfolioResponse getPortfolioByUserId(String userId) {
         Portfolio portfolio = portfolioRepository.findByUserId(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.PORTFOLIO_NOT_FOUND));
         

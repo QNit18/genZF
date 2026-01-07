@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface BudgetRuleRepository extends JpaRepository<BudgetRule, UUID> {
-    Optional<BudgetRule> findByUserId(UUID userId);
+    Optional<BudgetRule> findByUserId(String userId);
 }
 

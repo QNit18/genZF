@@ -10,11 +10,9 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring", uses = {BudgetEntryMapper.class})
 public interface BudgetRuleMapper {
-    @Mapping(target = "user", ignore = true)
     @Mapping(target = "budgets", ignore = true)
     BudgetRule toBudgetRule(BudgetRuleCreationRequest request);
     
-    @Mapping(target = "userId", source = "user.id")
     BudgetRuleResponse toBudgetRuleResponse(BudgetRule budgetRule);
     
     void updateBudgetRule(@MappingTarget BudgetRule budgetRule, BudgetRuleUpdateRequest request);

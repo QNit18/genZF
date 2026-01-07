@@ -21,10 +21,8 @@ public class BudgetRule {
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
 
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    User user;
+    @Column(name = "user_id", nullable = false, unique = true)
+    String userId;
 
     @Column(nullable = false, precision = 19, scale = 2)
     BigDecimal monthlyIncome;

@@ -14,7 +14,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BudgetRuleResponse {
     UUID id;
-    UUID userId;
+    String userId;
     BigDecimal monthlyIncome;
     List<BudgetEntryResponse> budgets;
 }

@@ -49,7 +49,7 @@ public class BudgetRuleController {
     }
 
     @GetMapping("/user/{userId}")
-    ApiBaseResponse<BudgetRuleResponse> getBudgetRuleByUserId(@PathVariable UUID userId) {
+    ApiBaseResponse<BudgetRuleResponse> getBudgetRuleByUserId(@PathVariable String userId) {
         ApiBaseResponse<BudgetRuleResponse> response = new ApiBaseResponse<>();
         response.setResult(budgetRuleService.getBudgetRuleByUserId(userId));
         return response;

@@ -15,7 +15,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PortfolioResponse {
     UUID id;
-    UUID userId;
+    String userId;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     BigDecimal totalNetWorth;

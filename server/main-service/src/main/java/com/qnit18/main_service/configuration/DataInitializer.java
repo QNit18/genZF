@@ -22,7 +22,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
-    private final UserRepository userRepository;
     private final AssetRepository assetRepository;
     private final PortfolioRepository portfolioRepository;
     private final BudgetRuleRepository budgetRuleRepository;
@@ -31,20 +30,24 @@ public class DataInitializer implements CommandLineRunner {
     private final ChartDataRepository chartDataRepository;
     private final SeriesItemRepository seriesItemRepository;
 
+    // Example user IDs - these should exist in auth-service
+    private static final String USER_ID_1 = "550e8400-e29b-41d4-a716-446655440000";
+    private static final String USER_ID_2 = "550e8400-e29b-41d4-a716-446655440001";
+    private static final String USER_ID_3 = "550e8400-e29b-41d4-a716-446655440002";
+
     @Override
     @Transactional
     public void run(String... args) {
-        if (userRepository.count() > 0) {
+        if (portfolioRepository.count() > 0) {
             log.info("Data already exists, skipping initialization");
             return;
         }
 
         log.info("Initializing example data...");
-
-        // Create Users
-        User user1 = createUser("john_doe");
-        User user2 = createUser("jane_smith");
-        User user3 = createUser("bob_wilson");
+        log.warn("Note: User IDs are hardcoded. Ensure these users exist in auth-service:");
+        log.warn("  User 1: {}", USER_ID_1);
+        log.warn("  User 2: {}", USER_ID_2);
+        log.warn("  User 3: {}", USER_ID_3);
 
         // Create Assets
         Asset gold = createAsset("XAU/USD", "Gold", AssetCategory.COMMODITY, 
@@ -79,10 +82,10 @@ public class DataInitializer implements CommandLineRunner {
         createSeriesItems(btcChart1D, new BigDecimal("67500.00"), 10);
         createSeriesItems(btcChart1M, new BigDecimal("67000.00"), 30);
 
-        // Create Portfolios
-        Portfolio portfolio1 = createPortfolio(user1);
-        Portfolio portfolio2 = createPortfolio(user2);
-        Portfolio portfolio3 = createPortfolio(user3);
+        // Create Portfolios (using userId strings)
+        Portfolio portfolio1 = createPortfolio(USER_ID_1);
+        Portfolio portfolio2 = createPortfolio(USER_ID_2);
+        Portfolio portfolio3 = createPortfolio(USER_ID_3);
 
         // Create Asset Users (Holdings)
         createAssetUser(portfolio1, "Gold", new BigDecimal("10.5"), new BigDecimal("2600.00"), 
@@ -102,31 +105,24 @@ public class DataInitializer implements CommandLineRunner {
         createAssetUser(portfolio3, "Bitcoin", new BigDecimal("1.0"), new BigDecimal("70000.00"),
                 null, new BigDecimal("4.0"), true); // Deleted holding
 
-        // Create Budget Rules
-        BudgetRule budgetRule1 = createBudgetRule(user1, new BigDecimal("5000.00"));
+        // Create Budget Rules (using userId strings)
+        BudgetRule budgetRule1 = createBudgetRule(USER_ID_1, new BigDecimal("5000.00"));
         createBudgetEntry(budgetRule1, "Needs", 50);
         createBudgetEntry(budgetRule1, "Wants", 30);
         createBudgetEntry(budgetRule1, "Savings", 20);
 
-        BudgetRule budgetRule2 = createBudgetRule(user2, new BigDecimal("7500.00"));
+        BudgetRule budgetRule2 = createBudgetRule(USER_ID_2, new BigDecimal("7500.00"));
         createBudgetEntry(budgetRule2, "Needs", 40);
         createBudgetEntry(budgetRule2, "Wants", 30);
         createBudgetEntry(budgetRule2, "Savings", 30);
 
-        BudgetRule budgetRule3 = createBudgetRule(user3, new BigDecimal("10000.00"));
+        BudgetRule budgetRule3 = createBudgetRule(USER_ID_3, new BigDecimal("10000.00"));
         createBudgetEntry(budgetRule3, "Needs", 50);
         createBudgetEntry(budgetRule3, "Wants", 25);
         createBudgetEntry(budgetRule3, "Savings", 25);
 
         log.info("Example data initialization completed successfully!");
-        log.info("Created: 3 users, 5 assets, 4 chart data entries, 3 portfolios, 7 asset holdings, 3 budget rules");
-    }
-
-    private User createUser(String username) {
-        User user = User.builder()
-                .username(username)
-                .build();
-        return userRepository.save(user);
+        log.info("Created: 5 assets, 4 chart data entries, 3 portfolios, 7 asset holdings, 3 budget rules");
     }
 
     private Asset createAsset(String symbol, String assetName, AssetCategory category,
@@ -175,9 +171,9 @@ public class DataInitializer implements CommandLineRunner {
         seriesItemRepository.saveAll(items);
     }
 
-    private Portfolio createPortfolio(User user) {
+    private Portfolio createPortfolio(String userId) {
         Portfolio portfolio = Portfolio.builder()
-                .user(user)
+                .userId(userId)
                 .build();
         return portfolioRepository.save(portfolio);
     }
@@ -197,9 +193,9 @@ public class DataInitializer implements CommandLineRunner {
         return assetUserRepository.save(assetUser);
     }
 
-    private BudgetRule createBudgetRule(User user, BigDecimal monthlyIncome) {
+    private BudgetRule createBudgetRule(String userId, BigDecimal monthlyIncome) {
         BudgetRule budgetRule = BudgetRule.builder()
-                .user(user)
+                .userId(userId)
                 .monthlyIncome(monthlyIncome)
                 .build();
         return budgetRuleRepository.save(budgetRule);
