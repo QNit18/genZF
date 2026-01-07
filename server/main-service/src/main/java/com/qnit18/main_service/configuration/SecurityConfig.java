@@ -29,6 +29,7 @@ public class SecurityConfig {
                 // Allow Swagger UI and API docs
                 .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
                 // Require authentication for portfolio and budget rule endpoints
+                .requestMatchers("/portfolio/**").authenticated()
                 .requestMatchers("/portfolios/**").authenticated()
                 .requestMatchers("/budget-rules/**").authenticated()
                 // Allow all other requests (for now, can be restricted later)

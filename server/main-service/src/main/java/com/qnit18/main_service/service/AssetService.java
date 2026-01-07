@@ -1,5 +1,6 @@
 package com.qnit18.main_service.service;
 
+import com.qnit18.main_service.constant.AssetCategory;
 import com.qnit18.main_service.dto.request.AssetCreationRequest;
 import com.qnit18.main_service.dto.request.AssetUpdateRequest;
 import com.qnit18.main_service.dto.response.AssetResponse;
@@ -8,9 +9,13 @@ import com.qnit18.main_service.exception.AppException;
 import com.qnit18.main_service.exception.ErrorCode;
 import com.qnit18.main_service.mapper.AssetMapper;
 import com.qnit18.main_service.repository.AssetRepository;
+import com.qnit18.main_service.repository.AssetSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +24,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -115,6 +121,32 @@ public class AssetService {
         }
 
         return assetMapper.toAssetResponse(assetRepository.save(asset));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AssetResponse> searchAssets(String q, AssetCategory category, Pageable pageable) {
+        Specification<Asset> spec = AssetSpecification.searchAssets(q, category);
+        return assetRepository.findAll(spec, pageable)
+                .map(assetMapper::toAssetResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AssetResponse> getHomeAssets() {
+        List<Asset> homeAssets = assetRepository.findByAssetHomeTrueOrderByChangePercentageDesc();
+        // Limit to 9 assets
+        return homeAssets.stream()
+                .limit(9)
+                .map(assetMapper::toAssetResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getAllAssetNames() {
+        return assetRepository.findAll().stream()
+                .map(Asset::getAssetName)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
     }
 }
 

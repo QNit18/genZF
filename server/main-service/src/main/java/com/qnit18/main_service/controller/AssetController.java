@@ -1,5 +1,6 @@
 package com.qnit18.main_service.controller;
 
+import com.qnit18.main_service.constant.AssetCategory;
 import com.qnit18.main_service.dto.request.AssetCreationRequest;
 import com.qnit18.main_service.dto.request.AssetUpdateRequest;
 import com.qnit18.main_service.dto.response.ApiBaseResponse;
@@ -12,6 +13,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -69,12 +74,58 @@ public class AssetController {
         return response;
     }
 
-    @Operation(summary = "Get all assets", description = "Retrieves a list of all available trading assets")
+    @Operation(summary = "Get all assets with pagination and filtering", description = "Retrieves assets with optional search, category filter, pagination, and sorting")
     @GetMapping
-    ApiBaseResponse<List<AssetResponse>> getAllAssets() {
-        ApiBaseResponse<List<AssetResponse>> response = new ApiBaseResponse<>();
-        response.setResult(assetService.getAllAssets());
+    ApiBaseResponse<Page<AssetResponse>> getAllAssets(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) AssetCategory category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "changePercentage,desc") String sort) {
+        
+        // Parse sort parameter (format: "field,direction")
+        Sort sortObj = parseSort(sort);
+        Pageable pageable = PageRequest.of(page, size, sortObj);
+        
+        ApiBaseResponse<Page<AssetResponse>> response = new ApiBaseResponse<>();
+        response.setResult(assetService.searchAssets(q, category, pageable));
         return response;
+    }
+
+    @Operation(summary = "Get home assets", description = "Retrieves up to 9 assets marked for home screen display")
+    @GetMapping("/home")
+    ApiBaseResponse<List<AssetResponse>> getHomeAssets() {
+        ApiBaseResponse<List<AssetResponse>> response = new ApiBaseResponse<>();
+        response.setResult(assetService.getHomeAssets());
+        return response;
+    }
+
+    @Operation(summary = "Get all asset names", description = "Retrieves a list of all distinct asset names")
+    @GetMapping("/name")
+    ApiBaseResponse<List<String>> getAllAssetNames() {
+        ApiBaseResponse<List<String>> response = new ApiBaseResponse<>();
+        response.setResult(assetService.getAllAssetNames());
+        return response;
+    }
+
+    private Sort parseSort(String sortParam) {
+        if (sortParam == null || sortParam.isEmpty()) {
+            return Sort.by(Sort.Direction.DESC, "changePercentage");
+        }
+
+        String[] parts = sortParam.split(",");
+        if (parts.length != 2) {
+            return Sort.by(Sort.Direction.DESC, "changePercentage");
+        }
+
+        String field = parts[0].trim();
+        String direction = parts[1].trim().toLowerCase();
+        
+        Sort.Direction sortDirection = direction.equals("asc") 
+            ? Sort.Direction.ASC 
+            : Sort.Direction.DESC;
+        
+        return Sort.by(sortDirection, field);
     }
 
     @Operation(summary = "Delete an asset", description = "Permanently deletes an asset from the system")

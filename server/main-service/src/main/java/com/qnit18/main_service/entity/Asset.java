@@ -65,6 +65,10 @@ public class Asset {
     @Column(nullable = false)
     MarketStatus marketStatus;
 
+    @Column(nullable = false)
+    @Builder.Default
+    Boolean assetHome = false;
+
     @JsonIgnore
     @OneToMany(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ChartData> chartDataList;
