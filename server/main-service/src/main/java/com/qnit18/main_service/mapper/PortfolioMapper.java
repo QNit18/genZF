@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {AssetUserMapper.class})
+@Mapper(componentModel = "spring")
 public interface PortfolioMapper {
     @Mapping(target = "assetUsers", ignore = true)
     @Mapping(target = "totalNetWorth", ignore = true)

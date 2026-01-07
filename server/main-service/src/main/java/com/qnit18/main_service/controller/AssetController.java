@@ -6,6 +6,8 @@ import com.qnit18.main_service.dto.request.AssetUpdateRequest;
 import com.qnit18.main_service.dto.response.ApiBaseResponse;
 import com.qnit18.main_service.dto.response.AssetResponse;
 import com.qnit18.main_service.service.AssetService;
+import com.qnit18.main_service.util.AssetUtil;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -30,33 +32,6 @@ import java.util.UUID;
 @Tag(name = "Asset Management", description = "APIs for managing trading assets (Gold, Bitcoin, Forex, etc.)")
 public class AssetController {
     AssetService assetService;
-
-    @Operation(summary = "Create a new asset", description = "Creates a new trading asset with real-time price data")
-    @PostMapping
-    ApiBaseResponse<AssetResponse> createAsset(@RequestBody @Valid AssetCreationRequest request) {
-        log.info("Creating asset: {}", request);
-        ApiBaseResponse<AssetResponse> response = new ApiBaseResponse<>();
-        response.setResult(assetService.createAsset(request));
-        return response;
-    }
-
-    @Operation(summary = "Update an asset", description = "Updates asset information including price and market data")
-    @PutMapping("/{id}")
-    ApiBaseResponse<AssetResponse> updateAsset(@PathVariable UUID id, @RequestBody @Valid AssetUpdateRequest request) {
-        log.info("Updating asset: {}", id);
-        ApiBaseResponse<AssetResponse> response = new ApiBaseResponse<>();
-        response.setResult(assetService.updateAsset(id, request));
-        return response;
-    }
-
-    @Operation(summary = "Update asset price", description = "Updates the current price and recalculates change percentage and high/low values")
-    @PutMapping("/{id}/price")
-    ApiBaseResponse<AssetResponse> updatePrice(@PathVariable UUID id, @RequestBody @Valid AssetUpdateRequest request) {
-        log.info("Updating asset price: {}", id);
-        ApiBaseResponse<AssetResponse> response = new ApiBaseResponse<>();
-        response.setResult(assetService.updatePrice(id, request));
-        return response;
-    }
 
     @Operation(summary = "Get asset by ID", description = "Retrieves asset details by its unique identifier")
     @GetMapping("/{id}")
@@ -84,7 +59,7 @@ public class AssetController {
             @RequestParam(defaultValue = "changePercentage,desc") String sort) {
         
         // Parse sort parameter (format: "field,direction")
-        Sort sortObj = parseSort(sort);
+        Sort sortObj = AssetUtil.parseSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortObj);
         
         ApiBaseResponse<Page<AssetResponse>> response = new ApiBaseResponse<>();
@@ -108,32 +83,39 @@ public class AssetController {
         return response;
     }
 
-    private Sort parseSort(String sortParam) {
-        if (sortParam == null || sortParam.isEmpty()) {
-            return Sort.by(Sort.Direction.DESC, "changePercentage");
-        }
-
-        String[] parts = sortParam.split(",");
-        if (parts.length != 2) {
-            return Sort.by(Sort.Direction.DESC, "changePercentage");
-        }
-
-        String field = parts[0].trim();
-        String direction = parts[1].trim().toLowerCase();
-        
-        Sort.Direction sortDirection = direction.equals("asc") 
-            ? Sort.Direction.ASC 
-            : Sort.Direction.DESC;
-        
-        return Sort.by(sortDirection, field);
-    }
-
     @Operation(summary = "Delete an asset", description = "Permanently deletes an asset from the system")
     @DeleteMapping("/{id}")
     ApiBaseResponse<String> deleteAsset(@PathVariable UUID id) {
         assetService.deleteAsset(id);
         ApiBaseResponse<String> response = new ApiBaseResponse<>();
         response.setResult("Asset has been deleted");
+        return response;
+    }
+    
+    @Operation(summary = "Create a new asset", description = "Creates a new trading asset with real-time price data")
+    @PostMapping
+    ApiBaseResponse<AssetResponse> createAsset(@RequestBody @Valid AssetCreationRequest request) {
+        log.info("Creating asset: {}", request);
+        ApiBaseResponse<AssetResponse> response = new ApiBaseResponse<>();
+        response.setResult(assetService.createAsset(request));
+        return response;
+    }
+
+    @Operation(summary = "Update an asset", description = "Updates asset information including price and market data")
+    @PutMapping("/{id}")
+    ApiBaseResponse<AssetResponse> updateAsset(@PathVariable UUID id, @RequestBody @Valid AssetUpdateRequest request) {
+        log.info("Updating asset: {}", id);
+        ApiBaseResponse<AssetResponse> response = new ApiBaseResponse<>();
+        response.setResult(assetService.updateAsset(id, request));
+        return response;
+    }
+
+    @Operation(summary = "Update asset price", description = "Updates the current price and recalculates change percentage and high/low values")
+    @PutMapping("/{id}/price")
+    ApiBaseResponse<AssetResponse> updatePrice(@PathVariable UUID id, @RequestBody @Valid AssetUpdateRequest request) {
+        log.info("Updating asset price: {}", id);
+        ApiBaseResponse<AssetResponse> response = new ApiBaseResponse<>();
+        response.setResult(assetService.updatePrice(id, request));
         return response;
     }
 }
