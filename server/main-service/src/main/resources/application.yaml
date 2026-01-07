@@ -1,0 +1,15 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /genzf
+
+spring:
+      data:
+        mongodb:
+          uri: "mongodb://postgres:postgres@localhost:27017/genzf"
+          database: genzf
+
+jwt:
+  signing-key: fbX2a4nQ4tdMnfExFUl+uA9aD9IFS+csS8GP96pR75RxrCiUcEYvpn+b4wWsgJshvXMUQiDUxhEBxA9RdPj+OQ==
+  valid-duration: 3600 # in second
+  refreshable-duration: 36000 # insecond
