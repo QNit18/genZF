@@ -35,6 +35,24 @@ export interface IncomeSplit {
   invest: number; // Savings/Invest
 }
 
+// Backend API Response Types
+export interface AssetResponse {
+  id: string;
+  symbol: string;
+  assetName: string;
+  category: 'COMMODITY' | 'FOREX' | 'CRYPTO';
+  currentPrice: number;
+  changePercentage: number;
+  changeValue: number;
+  lastUpdated: string; // ISO date string
+  currency: string;
+  open: number;
+  high: number;
+  low: number;
+  volume: number;
+  marketStatus: string;
+}
+
 export type TranslationKeys = 
   // Nav & Common
   | 'nav.home' | 'nav.markets' | 'nav.calculators' | 'nav.portfolio' | 'nav.income_split' 

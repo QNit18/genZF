@@ -5,7 +5,9 @@ import { TrendingUp, Calculator, PieChart, Wallet, ChevronLeft, ChevronRight } f
 import { useApp } from '../context/AppContext';
 import { Card } from '../components/ui/Card';
 import { MarketCard } from '../components/MarketCard';
-import { MOCK_MARKET_DATA } from '../constants';
+import { MarketCardSkeleton } from '../components/MarketCardSkeleton';
+import { getHomeAssets } from '../services/assetService';
+import { MarketItem } from '../types';
 
 export const Home: React.FC = () => {
   const { t, user } = useApp();
@@ -15,6 +17,11 @@ export const Home: React.FC = () => {
   // State to track scroll availability
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  
+  // State for market data
+  const [marketData, setMarketData] = useState<MarketItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const features = [
     { 
@@ -52,6 +59,27 @@ export const Home: React.FC = () => {
     }
   };
 
+  // Fetch home assets from API
+  useEffect(() => {
+    const fetchHomeAssets = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const assets = await getHomeAssets();
+        setMarketData(assets);
+      } catch (err) {
+        console.error('Failed to load home assets:', err);
+        setError(t('common.error'));
+        // Keep empty array on error, will show empty state
+        setMarketData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHomeAssets();
+  }, [t]);
+
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (container) {
@@ -67,7 +95,7 @@ export const Home: React.FC = () => {
         window.removeEventListener('resize', checkScroll);
       };
     }
-  }, []);
+  }, [marketData]); // Re-check scroll when data changes
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -112,11 +140,31 @@ export const Home: React.FC = () => {
           ref={scrollContainerRef}
           className="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x scroll-smooth"
         >
-          {MOCK_MARKET_DATA.slice(0, 6).map(item => (
-            <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-start">
-              <MarketCard item={item} />
+          {isLoading ? (
+            // Show skeleton loaders while loading
+            Array.from({ length: 6 }).map((_, idx) => (
+              <div key={`skeleton-${idx}`} className="min-w-[280px] md:min-w-[320px] snap-start">
+                <MarketCardSkeleton />
+              </div>
+            ))
+          ) : error ? (
+            // Show error message
+            <div className="w-full text-center py-8 text-slate-500">
+              <p>{error}</p>
             </div>
-          ))}
+          ) : marketData.length === 0 ? (
+            // Show empty state
+            <div className="w-full text-center py-8 text-slate-500">
+              <p>{t('common.no_data')}</p>
+            </div>
+          ) : (
+            // Show market cards
+            marketData.map(item => (
+              <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-start">
+                <MarketCard item={item} />
+              </div>
+            ))
+          )}
         </div>
       </section>
 
