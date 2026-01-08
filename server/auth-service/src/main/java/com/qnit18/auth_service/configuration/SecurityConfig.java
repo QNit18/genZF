@@ -25,8 +25,13 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableMethodSecurity   
 public class SecurityConfig {
 
-     private final String[] PUBLIC_ENDPOINTS = {"/users",
-            "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh-token"
+     private final String[] PUBLIC_ENDPOINTS = {
+            "/users",
+            "/auth/token", 
+            "/auth/introspect", 
+            "/auth/logout", 
+            "/auth/refresh-token",
+            "/actuator/**"
     };
 
     @Autowired
@@ -35,7 +40,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                request.requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 ->

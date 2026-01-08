@@ -1,0 +1,49 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: auth-service
+            uri: http://localhost:8081
+            predicates:
+              - Path=/api/auth/**
+            filters:
+              - StripPrefix=2
+          - id: main-service
+            uri: http://localhost:8181
+            predicates:
+              - Path=/api/main/**
+            filters:
+              - StripPrefix=2
+
+# Service URLs for direct communication
+services:
+  auth:
+    url: http://localhost:8081
+  main:
+    url: http://localhost:8181
+
+# JWT Configuration
+jwt:
+  signing-key: fbX2a4nQ4tdMnfExFUl+uA9aD9IFS+csS8GP96pR75RxrCiUcEYvpn+b4wWsgJshvXMUQiDUxhEBxA9RdPj+OQ==
+
+# Management endpoints for Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.qnit18.api_gateway: INFO
+    org.springframework.cloud.gateway: DEBUG

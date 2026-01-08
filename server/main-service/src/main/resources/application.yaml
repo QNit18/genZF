@@ -1,11 +1,11 @@
 server:
   port: 8181
-  servlet:
-    context-path: /genzf
 
 spring:
+  application:
+    name: main-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/genzf
+    url: jdbc:postgresql://localhost:5432/genzf_main
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -20,11 +20,13 @@ spring:
 
 jwt:
   signing-key: fbX2a4nQ4tdMnfExFUl+uA9aD9IFS+csS8GP96pR75RxrCiUcEYvpn+b4wWsgJshvXMUQiDUxhEBxA9RdPj+OQ==
-  valid-duration: 3600 # in second
-  refreshable-duration: 36000 # insecond
+  valid-duration: 3600 # in seconds
+  refreshable-duration: 36000 # in seconds
 
-auth-service:
-  url: http://localhost:8080
+# Service URLs for direct service-to-service communication
+services:
+  auth:
+    url: http://localhost:8081
 
 springdoc:
   api-docs:
@@ -37,3 +39,40 @@ springdoc:
   show-actuator: false
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+
+# Management endpoints for Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Resilience4j Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      authService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+  retry:
+    instances:
+      authService:
+        maxAttempts: 3
+        waitDuration: 1s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+
+# Logging
+logging:
+  level:
+    com.qnit18.main_service: INFO
+    org.springframework.security: DEBUG

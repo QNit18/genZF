@@ -26,6 +26,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Allow actuator health checks
+                .requestMatchers("/actuator/**").permitAll()
                 // Allow public access to asset exploration endpoints
                 .requestMatchers("/assets/**").permitAll()
                 .requestMatchers("/chart-data/**").permitAll()
