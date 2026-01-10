@@ -1,11 +1,10 @@
-package com.qnit18.main_service.configuration;
+package com.qnit18.api_gateway.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,12 +17,9 @@ public class JwtDecoderConfig {
     private String signingKey;
 
     @Bean
-    public JwtDecoder jwtDecoder() {
+    public ReactiveJwtDecoder jwtDecoder() {
         byte[] keyBytes = Base64.getDecoder().decode(signingKey);
         SecretKey secretKey = new SecretKeySpec(keyBytes, "HmacSHA512");
-        return NimbusJwtDecoder.withSecretKey(secretKey)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
+        return NimbusReactiveJwtDecoder.withSecretKey(secretKey).build();
     }
 }
-

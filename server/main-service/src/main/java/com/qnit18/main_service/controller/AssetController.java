@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -85,6 +86,7 @@ public class AssetController {
 
     @Operation(summary = "Delete an asset", description = "Permanently deletes an asset from the system")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiBaseResponse<String> deleteAsset(@PathVariable UUID id) {
         assetService.deleteAsset(id);
         ApiBaseResponse<String> response = new ApiBaseResponse<>();
@@ -94,6 +96,7 @@ public class AssetController {
     
     @Operation(summary = "Create a new asset", description = "Creates a new trading asset with real-time price data")
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     ApiBaseResponse<AssetResponse> createAsset(@RequestBody @Valid AssetCreationRequest request) {
         log.info("Creating asset: {}", request);
         ApiBaseResponse<AssetResponse> response = new ApiBaseResponse<>();
@@ -103,6 +106,7 @@ public class AssetController {
 
     @Operation(summary = "Update an asset", description = "Updates asset information including price and market data")
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiBaseResponse<AssetResponse> updateAsset(@PathVariable UUID id, @RequestBody @Valid AssetUpdateRequest request) {
         log.info("Updating asset: {}", id);
         ApiBaseResponse<AssetResponse> response = new ApiBaseResponse<>();
@@ -112,6 +116,7 @@ public class AssetController {
 
     @Operation(summary = "Update asset price", description = "Updates the current price and recalculates change percentage and high/low values")
     @PutMapping("/{id}/price")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiBaseResponse<AssetResponse> updatePrice(@PathVariable UUID id, @RequestBody @Valid AssetUpdateRequest request) {
         log.info("Updating asset price: {}", id);
         ApiBaseResponse<AssetResponse> response = new ApiBaseResponse<>();

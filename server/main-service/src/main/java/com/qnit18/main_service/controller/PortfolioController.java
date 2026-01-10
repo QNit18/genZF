@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class PortfolioController {
     PortfolioService portfolioService;
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     ApiBaseResponse<PortfolioResponse> createPortfolio(@RequestBody @Valid PortfolioCreationRequest request) {
         log.info("Creating portfolio: {}", request);
         ApiBaseResponse<PortfolioResponse> response = new ApiBaseResponse<>();
@@ -32,6 +34,7 @@ public class PortfolioController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     ApiBaseResponse<PortfolioResponse> getPortfolioById(@PathVariable UUID id) {
         ApiBaseResponse<PortfolioResponse> response = new ApiBaseResponse<>();
         response.setResult(portfolioService.getPortfolioById(id));
@@ -39,6 +42,7 @@ public class PortfolioController {
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("isAuthenticated()")
     ApiBaseResponse<PortfolioResponse> getPortfolioByUserId(@PathVariable String userId) {
         ApiBaseResponse<PortfolioResponse> response = new ApiBaseResponse<>();
         response.setResult(portfolioService.getPortfolioByUserId(userId));
@@ -46,6 +50,7 @@ public class PortfolioController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     ApiBaseResponse<String> deletePortfolio(@PathVariable UUID id) {
         portfolioService.deletePortfolio(id);
         ApiBaseResponse<String> response = new ApiBaseResponse<>();
