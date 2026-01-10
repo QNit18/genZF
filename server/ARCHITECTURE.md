@@ -29,7 +29,7 @@ GenZF follows a microservices architecture pattern with API Gateway, Authenticat
 ┌──────────┐  ┌─────────────┐
 │  Auth    │  │    Main     │
 │ Service  │  │   Service   │
-│(Port 8080)  │(Port 8181)  │
+│(Port 8080)  │(Port 8081)  │
 │           │  │             │
 │- Login    │  │- Portfolios │
 │- Register │  │- Assets     │
@@ -58,7 +58,7 @@ GenZF follows a microservices architecture pattern with API Gateway, Authenticat
 
 **Key Routes**:
 - `/auth-service/**` → Auth Service
-- `/genzf/**` → Main Service
+- `/main-service/**` → Main Service
 
 ### 2. Auth Service (Port 8080)
 **Purpose**: Handle user authentication and authorization
@@ -86,7 +86,7 @@ GenZF follows a microservices architecture pattern with API Gateway, Authenticat
 - Permission
 - InvalidedToken
 
-### 3. Main Service (Port 8181)
+### 3. Main Service (Port 8081)
 **Purpose**: Core business logic for GenZF application
 
 **Responsibilities**:
@@ -115,7 +115,7 @@ GenZF follows a microservices architecture pattern with API Gateway, Authenticat
 ### 1. User Registration Flow
 ```
 Client → Gateway → Auth Service
-  POST /auth-service/users
+  POST http://localhost:8888/auth-service/users
   {
     "username": "john",
     "password": "password123",
@@ -147,7 +147,7 @@ Client → Gateway → Auth Service
 
 ### 3. Protected Request Flow
 ```
-1. Client → Gateway: GET /genzf/portfolios/user/{userId}
+1. Client → Gateway: GET /main-service/portfolios/user/{userId}
    Headers: Authorization: Bearer <JWT_TOKEN>
 
 2. Gateway JWT Filter:
@@ -235,10 +235,10 @@ Response: Success
 - `POST /auth-service/auth/introspect` - Token introspection
 - `POST /auth-service/auth/logout` - Logout
 - `POST /auth-service/auth/refresh-token` - Token refresh
-- `GET /genzf/assets/**` - Asset exploration
-- `GET /genzf/chart-data/**` - Chart data
-- `GET /genzf/swagger-ui/**` - Swagger UI
-- `GET /genzf/api-docs/**` - API documentation
+- `GET /main-service/assets/**` - Asset exploration
+- `GET /main-service/chart-data/**` - Chart data
+- `GET /main-service/swagger-ui/**` - Swagger UI
+- `GET /main-service/api-docs/**` - API documentation
 
 ### Protected Endpoints (Authentication Required)
 - All other endpoints require valid JWT token
@@ -297,14 +297,12 @@ server:
 # Auth Service
 server:
   port: 8080
-  servlet:
-    context-path: /auth-service
 
 # Main Service
 server:
-  port: 8181
+  port: 8081
   servlet:
-    context-path: /genzf
+    context-path: /main-service
 ```
 
 ## Database Schema
@@ -331,7 +329,7 @@ server:
 
 ### Startup Order
 1. Start Auth Service (Port 8080)
-2. Start Main Service (Port 8181)
+2. Start Main Service (Port 8081)
 3. Start API Gateway (Port 8888)
 
 ### Build All Services
@@ -393,7 +391,7 @@ Response:
 
 ### 3. Access Protected Endpoint
 ```bash
-curl -X GET http://localhost:8888/genzf/portfolios/user/USER_ID \
+curl -X GET http://localhost:8888/main-service/portfolios/user/USER_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 

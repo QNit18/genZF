@@ -19,7 +19,7 @@ mvn spring-boot:run
 cd server/main-service
 mvn spring-boot:run
 ```
-✅ Running on http://localhost:8181
+✅ Running on http://localhost:8081
 
 ### Terminal 3: API Gateway
 ```bash
@@ -105,12 +105,12 @@ curl -X GET http://localhost:8888/auth-service/users/my-info \
 ### Step 4: Create a Portfolio (Protected Endpoint)
 ```bash
 # Replace YOUR_JWT_TOKEN and USER_ID
-curl -X POST http://localhost:8888/genzf/portfolios \
+curl -X POST http://localhost:8888/main-service/portfolios \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "USER_ID_FROM_STEP_3",
-    "cashBalance": 10000.00
+    "name": "My Portfolio"
   }'
 ```
 
@@ -130,26 +130,35 @@ curl -X POST http://localhost:8888/genzf/portfolios \
 ### Step 5: Access Public Endpoints (No Token Required)
 ```bash
 # Get all assets (public)
-curl -X GET http://localhost:8888/genzf/assets
+curl -X GET http://localhost:8888/main-service/assets
 
 # Get asset by symbol (public)
-curl -X GET http://localhost:8888/genzf/assets/symbol/XAU-USD
+curl -X GET http://localhost:8888/main-service/assets/symbol/XAU-USD
 
 # Get home assets (public)
-curl -X GET http://localhost:8888/genzf/assets/home
+curl -X GET http://localhost:8888/main-service/assets/home
 ```
 
 ### Step 6: Test Admin Endpoints (Requires ADMIN Role)
 ```bash
 # This will fail with 403 if user is not ADMIN
-curl -X POST http://localhost:8888/genzf/assets \
+curl -X POST http://localhost:8888/main-service/assets \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Gold",
     "symbol": "XAU/USD",
-    "category": "GOLD",
-    "currentPrice": 2050.00
+    "category": "COMMODITIES",
+    "currentPrice": 2050.00,
+    "changePercentage": 1.5,
+    "changeValue": 30.0,
+    "currency": "USD",
+    "open": 2020.0,
+    "high": 2060.0,
+    "low": 2010.0,
+    "volume": 1000000,
+    "marketStatus": "OPEN",
+    "isHome": true
   }'
 ```
 
@@ -179,7 +188,7 @@ curl -X POST http://localhost:8888/auth-service/auth/logout \
 ┌─────────┐ ┌─────────┐
 │  Auth   │ │  Main   │
 │ Service │ │ Service │
-│  8080   │ │  8181   │
+│  8080   │ │  8081   │
 └─────────┘ └─────────┘
 ```
 
@@ -199,14 +208,14 @@ curl -X POST http://localhost:8888/auth-service/auth/logout \
 ### Main Service (via Gateway)
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/genzf/assets` | No | List assets |
-| GET | `/genzf/assets/{id}` | No | Get asset |
-| POST | `/genzf/assets` | Admin | Create asset |
-| PUT | `/genzf/assets/{id}` | Admin | Update asset |
-| DELETE | `/genzf/assets/{id}` | Admin | Delete asset |
-| GET | `/genzf/portfolios/user/{userId}` | Yes | Get user portfolio |
-| POST | `/genzf/portfolios` | Yes | Create portfolio |
-| DELETE | `/genzf/portfolios/{id}` | Yes | Delete portfolio |
+| GET | `/main-service/assets` | No | List assets |
+| GET | `/main-service/assets/{id}` | No | Get asset |
+| POST | `/main-service/assets` | Admin | Create asset |
+| PUT | `/main-service/assets/{id}` | Admin | Update asset |
+| DELETE | `/main-service/assets/{id}` | Admin | Delete asset |
+| GET | `/main-service/portfolios/user/{userId}` | Yes | Get user portfolio |
+| POST | `/main-service/portfolios` | Yes | Create portfolio |
+| DELETE | `/main-service/portfolios/{id}` | Yes | Delete portfolio |
 
 ## 5. JWT Token Structure
 
@@ -255,7 +264,8 @@ export DB_PASSWORD=postgres
 ## 8. Swagger UI
 
 Access API documentation:
-- Main Service: http://localhost:8888/genzf/swagger-ui.html
+- Main Service (Direct): http://localhost:8081/main-service/swagger-ui.html
+- Main Service (via Gateway): http://localhost:8888/main-service/swagger-ui.html
 
 ## 9. Next Steps
 
