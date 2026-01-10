@@ -1,5 +1,5 @@
 meta {
-  name: create User
+  name: Create User
   type: http
   seq: 1
 }
@@ -12,11 +12,11 @@ post {
 
 body:json {
   {
-      "username": "quang123",
-      "password": "quangquang123",
-      "firstName": "quang",
-      "lastName": "quang",
-      "dob": "2003-03-18"
+    "username": "newuser",
+    "password": "password123",
+    "firstName": "John",
+    "lastName": "Doe",
+    "dob": "1990-01-01"
   }
 }
 
@@ -24,3 +24,4 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+

@@ -1,0 +1,17 @@
+meta {
+  name: Delete Asset (ADMIN)
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{api-gateway-MainSERVICE}}/assets/{{sampleAssetId}}
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

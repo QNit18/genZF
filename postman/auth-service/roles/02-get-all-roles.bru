@@ -1,0 +1,17 @@
+meta {
+  name: Get All Roles
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{api-gateway-AuthSERVICE}}/roles
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

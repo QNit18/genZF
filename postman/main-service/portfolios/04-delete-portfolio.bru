@@ -1,0 +1,17 @@
+meta {
+  name: Delete Portfolio
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{api-gateway-MainSERVICE}}/portfolios/{{samplePortfolioId}}
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

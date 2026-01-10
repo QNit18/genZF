@@ -1,0 +1,25 @@
+meta {
+  name: Create Portfolio
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{api-gateway-MainSERVICE}}/portfolios
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "userId": "{{sampleUserId}}",
+    "name": "My Investment Portfolio",
+    "description": "Personal trading portfolio"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

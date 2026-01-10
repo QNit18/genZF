@@ -20,8 +20,6 @@ spring:
           uri: http://localhost:8181
           predicates:
             - Path=/genzf/**
-          filters:
-            - StripPrefix=1
       
       # Global CORS configuration
       globalcors:

@@ -1,0 +1,17 @@
+meta {
+  name: Health Check - Main Service
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8181/genzf/actuator/health
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

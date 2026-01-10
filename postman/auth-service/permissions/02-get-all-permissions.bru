@@ -1,0 +1,17 @@
+meta {
+  name: Get All Permissions
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{api-gateway-AuthSERVICE}}/permissions
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

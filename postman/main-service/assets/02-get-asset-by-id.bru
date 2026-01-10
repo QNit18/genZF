@@ -1,16 +1,17 @@
 meta {
-  name: get home Assets
+  name: Get Asset by ID
   type: http
   seq: 2
 }
 
 get {
-  url: {{main-service}}/assets
+  url: {{api-gateway-MainSERVICE}}/assets/{{sampleAssetId}}
   body: none
-  auth: inherit
+  auth: none
 }
 
 settings {
   encodeUrl: true
   timeout: 0
 }
+

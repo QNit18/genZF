@@ -1,11 +1,11 @@
 meta {
-  name: get all Assets
+  name: Get User by ID
   type: http
-  seq: 1
+  seq: 2
 }
 
 get {
-  url: {{main-service}}/assets
+  url: {{api-gateway-AuthSERVICE}}/users/{{sampleUserId}}
   body: none
   auth: inherit
 }
@@ -14,3 +14,4 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+

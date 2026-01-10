@@ -1,11 +1,11 @@
 meta {
-  name: Health auth-service
+  name: Get All Users
   type: http
-  seq: 1
+  seq: 4
 }
 
 get {
-  url: http://localhost:8080/health
+  url: {{api-gateway-AuthSERVICE}}/users
   body: none
   auth: inherit
 }
@@ -14,3 +14,4 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+

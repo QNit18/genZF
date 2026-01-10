@@ -1,0 +1,17 @@
+meta {
+  name: Get Home Assets
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{api-gateway-MainSERVICE}}/assets/home
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

@@ -1,0 +1,27 @@
+meta {
+  name: Update User
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{api-gateway-AuthSERVICE}}/users/{{sampleUserId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "password": "newpassword123",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "dob": "1990-01-01",
+    "roles": ["USER"]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

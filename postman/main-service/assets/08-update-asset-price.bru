@@ -1,0 +1,23 @@
+meta {
+  name: Update Asset Price (ADMIN)
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{api-gateway-MainSERVICE}}/assets/{{sampleAssetId}}/price
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "currentPrice": 47000.00
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

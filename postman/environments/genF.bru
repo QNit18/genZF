@@ -1,6 +1,19 @@
 vars {
-  auth-service: http://localhost:8080/auth-service
+  // Direct service URLs
+  auth-service: http://localhost:8080
   main-service: http://localhost:8181/genzf
+  
+  // API Gateway URLs (preferred for testing)
   api-gateway-AuthSERVICE: http://localhost:8888/auth-service
   api-gateway-MainSERVICE: http://localhost:8888/genzf
+  
+  // Authentication token (set after login)
+  token: 
+  
+  // Sample IDs for testing (update with actual values)
+  sampleUserId: 
+  sampleAssetId: 
+  samplePortfolioId: 
+  sampleRoleName: USER
+  samplePermissionName: CREATE_DATA
 }

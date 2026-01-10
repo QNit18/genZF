@@ -1,0 +1,30 @@
+meta {
+  name: Create Asset (ADMIN)
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{api-gateway-MainSERVICE}}/assets
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Bitcoin",
+    "symbol": "BTC/USD",
+    "category": "CRYPTO",
+    "currentPrice": 45000.00,
+    "changePercentage": 2.5,
+    "dayHigh": 46000.00,
+    "dayLow": 44000.00,
+    "isHome": false
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

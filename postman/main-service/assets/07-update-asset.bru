@@ -1,0 +1,30 @@
+meta {
+  name: Update Asset (ADMIN)
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{api-gateway-MainSERVICE}}/assets/{{sampleAssetId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Bitcoin",
+    "symbol": "BTC/USD",
+    "category": "CRYPTO",
+    "currentPrice": 46000.00,
+    "changePercentage": 3.0,
+    "dayHigh": 46500.00,
+    "dayLow": 44500.00,
+    "isHome": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

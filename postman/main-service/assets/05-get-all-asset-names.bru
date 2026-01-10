@@ -1,0 +1,17 @@
+meta {
+  name: Get All Asset Names
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{api-gateway-MainSERVICE}}/assets/name
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

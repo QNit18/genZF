@@ -1,0 +1,17 @@
+meta {
+  name: Get Asset by Symbol
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{api-gateway-MainSERVICE}}/assets/symbol/XAU/USD
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

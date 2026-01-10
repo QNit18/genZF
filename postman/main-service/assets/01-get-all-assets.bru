@@ -1,0 +1,25 @@
+meta {
+  name: Get All Assets
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{api-gateway-MainSERVICE}}/assets?page=0&size=10&sort=changePercentage,desc
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 0
+  size: 10
+  sort: changePercentage,desc
+  ~q: 
+  ~category: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

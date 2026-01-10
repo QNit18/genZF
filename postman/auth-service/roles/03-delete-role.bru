@@ -1,0 +1,17 @@
+meta {
+  name: Delete Role
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{api-gateway-AuthSERVICE}}/roles/{{sampleRoleName}}
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
