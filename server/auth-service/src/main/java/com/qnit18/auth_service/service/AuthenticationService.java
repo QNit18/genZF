@@ -29,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -52,6 +53,10 @@ public class AuthenticationService {
 
     UserRepository userRepository;
     ValideTokenRepository valideTokenRepository;
+
+    private byte[] getSigningKeyBytes() {
+        return Base64.getDecoder().decode(SIGNING_KEY);
+    }
 
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -124,7 +129,7 @@ public class AuthenticationService {
 
     SignedJWT verifyToken(String token, boolean isRefresh) throws Exception {
         try {
-            JWSVerifier verifier = new MACVerifier(SIGNING_KEY);
+            JWSVerifier verifier = new MACVerifier(getSigningKeyBytes());
             SignedJWT signedJWT = SignedJWT.parse(token);
             
             // Verify signature first
@@ -184,7 +189,7 @@ public class AuthenticationService {
         JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
-            jwsObject.sign(new MACSigner(SIGNING_KEY));
+            jwsObject.sign(new MACSigner(getSigningKeyBytes()));
         } catch (JOSEException e) {
             log.info("Error signing the token: {}", e.getMessage());
             throw new RuntimeException(e);

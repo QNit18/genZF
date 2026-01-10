@@ -5,18 +5,18 @@ meta {
 }
 
 post {
-  url: {{auth-service}}/users
+  url: {{api-gateway-AuthSERVICE}}/users
   body: json
   auth: none
 }
 
 body:json {
   {
-      "username": "quang12",
-      "password": "quangquang12",
+      "username": "quang123",
+      "password": "quangquang123",
       "firstName": "quang",
       "lastName": "quang",
-      "dob": "2023-03-18"
+      "dob": "2003-03-18"
   }
 }
 
