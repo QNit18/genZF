@@ -38,7 +38,7 @@ Handles authentication, authorization, and user management:
 - **Roles**: Role management with permissions
 - **Permissions**: Permission management
 
-### Main Service (Port 8181)
+### Main Service (Port 8081)
 Core business logic for the GenZF platform:
 - **Assets**: Trading assets management (Gold, Bitcoin, Forex, etc.)
 - **Portfolios**: User investment portfolio management
@@ -46,7 +46,7 @@ Core business logic for the GenZF platform:
 ### API Gateway (Port 8888)
 Routes requests to appropriate microservices:
 - `/auth-service/**` → Auth Service
-- `/genzf/**` → Main Service
+- `/main-service/**` → Main Service
 
 ## Environment Variables
 
@@ -55,9 +55,9 @@ The `genF.bru` environment file contains the following variables:
 | Variable | Description | Example Value |
 |----------|-------------|---------------|
 | `auth-service` | Direct auth service URL | `http://localhost:8080` |
-| `main-service` | Direct main service URL | `http://localhost:8181/genzf` |
+| `main-service` | Direct main service URL | `http://localhost:8081/main-service` |
 | `api-gateway-AuthSERVICE` | Auth service via gateway | `http://localhost:8888/auth-service` |
-| `api-gateway-MainSERVICE` | Main service via gateway | `http://localhost:8888/genzf` |
+| `api-gateway-MainSERVICE` | Main service via gateway | `http://localhost:8888/main-service` |
 | `token` | JWT token (set after login) | _(empty, set after login)_ |
 | `sampleUserId` | Sample user ID for testing | _(empty, update with actual ID)_ |
 | `sampleAssetId` | Sample asset ID for testing | _(empty, update with actual ID)_ |
@@ -88,7 +88,7 @@ mvn spring-boot:run
 
 Use the health check endpoints:
 - Auth Service: `GET http://localhost:8080/actuator/health`
-- Main Service: `GET http://localhost:8181/genzf/actuator/health`
+- Main Service: `GET http://localhost:8081/main-service/actuator/health`
 
 ### 3. Login to Get Token
 
@@ -163,7 +163,7 @@ Some endpoints support query parameters for filtering, pagination, and sorting:
 - `size`: Page size (default: 10)
 - `sort`: Sort field and direction (default: `changePercentage,desc`)
 
-Example: `/assets?q=gold&category=COMMODITIES&page=0&size=10&sort=currentPrice,asc`
+Example: `/main-service/assets?q=gold&category=COMMODITIES&page=0&size=10&sort=currentPrice,asc`
 
 ## Tips for Development
 
@@ -182,7 +182,7 @@ Example: `/assets?q=gold&category=COMMODITIES&page=0&size=10&sort=currentPrice,a
 
 ### 404 Not Found
 - Check service is running
-- Verify URL includes correct context path (`/genzf` for main service)
+- Verify URL includes correct context path (`/main-service` for main service)
 - Ensure API Gateway is routing correctly
 
 ### Connection Refused
@@ -203,8 +203,8 @@ When adding new endpoints:
 ## API Documentation
 
 For detailed API documentation with schemas and response examples:
-- Main Service Swagger UI: `http://localhost:8181/genzf/swagger-ui.html`
-- Main Service OpenAPI Docs: `http://localhost:8181/genzf/api-docs`
+- Main Service Swagger UI: `http://localhost:8081/main-service/swagger-ui.html`
+- Main Service OpenAPI Docs: `http://localhost:8081/main-service/api-docs`
 
 ## Architecture
 
